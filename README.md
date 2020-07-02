@@ -1,1 +1,0 @@
-# CP3-Pathtara-Tungcharoen
