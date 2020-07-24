@@ -1,11 +1,14 @@
-
-from forex_python.converter import *
+# Import duty price calculator
 import math as m 
+from forex_python.converter import *
 from datetime import datetime
+
 
 c = CurrencyRates()
 
+
 class UserData:
+    
     id = "admin"
     password = "1234"
     
@@ -18,7 +21,9 @@ class Product:
     def add_product_quantity():
         price = 0
         try:
-            Product.product_quantity = int(input("How many products did you wish to calculate? : "))
+            Product.product_quantity = int(
+                input("How many products did you wish to calculate? : ")
+            )
             print("")
         except:
             print("Only number can be inputed!!!")
@@ -29,7 +34,6 @@ class Product:
             print("")
             return Product.add_product_quantity()
         return Product.add_product_list()
-            
             
     def add_product_list():
         i = 0
@@ -42,7 +46,6 @@ class Product:
                 print("Currency not found. Please try again!!!")
                 print("")
                 return Product.add_product_list()            
-
         print("")
         i = 0    
         for i in range(0, Product.product_quantity):
@@ -56,7 +59,13 @@ class Product:
                print("Please re-enter product's name and price.")
                print("")
                return Product.add_product_list()
-           Product.product_list.append([product, price, currency.upper()]) 
+           Product.product_list.append(
+               [
+                   product, 
+                   price, 
+                   currency.upper()
+               ]
+            ) 
         return Calculator.calculate()              
 
 
@@ -64,7 +73,6 @@ class ExchangeRate:
     
     user_rate = 0
     ccy = list(c.get_rates("THB").keys())
-   
     
     def exchange_rate_list():
         print("Exchange rate Data as of ", datetime.now())
@@ -91,7 +99,7 @@ class Calculator:
     
     total_price_foreign = 0
     total_price_THB = 0
-    duty_rate = 0.10 #estimate 10%
+    duty_rate = 0.10  # Suppose that duty rate = 10%
     duty = 0 
     vat = 0
     
@@ -101,12 +109,15 @@ class Calculator:
         print("")
         Calculator.total_product_list()
         ExchangeRate.user_exchange_rate()
-        Calculator.total_price_THB = Calculator.total_price_foreign * ExchangeRate.user_rate
-        print("Total in THB :             THB", round(Calculator.total_price_THB), 2)
+        Calculator.total_price_THB = (Calculator.total_price_foreign 
+                                       * ExchangeRate.user_rate)
+        print("Total in THB :             THB", round(Calculator.total_price_THB, 2))
         Calculator.tax_calculate()
-        print("Duty", " " * 21, "THB", Calculator.duty)
-        print("VAT (7%)", " " * 17, "THB", Calculator.vat)
-        net_price = Calculator.total_price_THB + Calculator.vat + Calculator.duty
+        print("Duty", " " * 21, "THB", round(Calculator.duty, 2))
+        print("VAT (7%)", " " * 17, "THB", round(Calculator.vat, 2))
+        net_price = (Calculator.total_price_THB 
+                      + Calculator.vat 
+                      + Calculator.duty)
         print("")
         print("Net Price :", " " * 14, "THB", round(net_price, 2))
         print("_" * 40)
@@ -117,20 +128,24 @@ class Calculator:
     def total_product_list():
         products = Product.product_list
         for i in range(len(products)):
-            print(products[i][0], " " * 15,  products[i][2], " ", products[i][1])
-            Calculator.total_price_foreign =+ products[i][1]
+            print(products[i][0], " " * 15, products[i][2], " ", products[i][1])
+            Calculator.total_price_foreign += products[i][1]
         print("")
-        print("Total in foreign currency:", products[0][2] , " ", Calculator.total_price_foreign)
+        print(
+            "Total in foreign currency:", 
+            products[0][2] , 
+            " ", 
+            Calculator.total_price_foreign
+        )
         print("")
     
     def tax_calculate():
-        Calculator.duty = round(Calculator.total_price_THB * Calculator.duty_rate, 2)
-#        duty_price = Calculator.total_price_THB + duty
-        Calculator.vat = round((Calculator.total_price_THB + Calculator.duty) * 0.07, 2)
-        
-          
-        
-   
+        product = Product.product_list
+        for i in range(len(product)):
+            x = product[i][1] * ExchangeRate.user_rate * Calculator.duty_rate 
+            Calculator.duty += x
+        Calculator.vat = (Calculator.total_price_THB + Calculator.duty) * 0.07
+
     
 class Main:
     def user_login():
@@ -149,8 +164,7 @@ class Main:
                     print("")
                 else : 
                     print("Please try again later : (")
-                    quit()
-            
+                    return Main.exit_program()
     
     def print_welcome():
         print("Duty Calculator".center(40, "-"))
@@ -176,11 +190,9 @@ class Main:
             print("")
             return Main.menu_selected()
         
-        
     def exit_program():
        print("Thank you".center(40, "_"))
        quit()        
-        
         
         
 Main.print_welcome()    
