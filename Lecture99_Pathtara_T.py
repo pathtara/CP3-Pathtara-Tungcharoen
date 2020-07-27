@@ -16,12 +16,10 @@ def calculate(event):
     bmi2_result.configure(text = bmi_2)
 
     
-    
-
 MainWindow = Tk()
 height_box = Label(MainWindow, text = "Height (CM)")
 height_box.grid(row = 0, column = 0)
-height_entry = Entry(MainWindow, anchor = c)
+height_entry = Entry(MainWindow)
 height_entry.grid(row = 0, column = 1)
 weight_box = Label(MainWindow, text = "Weight (KG)")
 weight_box.grid(row = 1, column = 0)
