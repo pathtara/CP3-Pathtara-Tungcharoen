@@ -1,14 +1,14 @@
 #Business Strategic Analysis
-import pandas as pd
+#import pandas as pd
 #from sklearn import *
-import seaborn as sns
-import matplotlib.pyplot as plt
+#import seaborn as sns
+#import matplotlib.pyplot as plt
 import firebase_admin
-import requests
-from pandas_datareader import data
+#import requests
+#from pandas_datareader import data
 from firebase_admin import credentials
 from firebase_admin import db
-from bs4 import BeautifulSoup as bs
+#from bs4 import BeautifulSoup as bs
 
 
 
@@ -88,31 +88,25 @@ class main_window:
         print("Thank you".center(40, "-"))    
         
 
-class Forex:
-    pass
+class inventory:
+    def input_data():
+        name = str(input("Name: "))
+        catagory = str(input("Catagory: "))
+         unit = str(input("Unit: "))
+        
+        
+        
+        
+     
+    def eoq():
+        pass       
 
         
-class Equity:
-    def get_quote():
-        pass
+#class Equity:
+#    def get_quote():
+#        pass
     
-    df = data.DataReader('BANPU.bk', data_source='yahoo', start='2015-01-01', end= '2020-07-29')
-
-    def fundamental_matric(soup, metric):
-        return soup.find(text = metric).find_next(class_='snapshot-td2').text
-        
-        
-    def get_fundaamental_data(df):
-        for symbol in df.index:
-            try:
-                url = ("http://finviz.com/quote.ashx?t" + symbol.lower())        
-                soup = bs(requests.get(url).content)
-                for m in df.columns:
-                    df.loc[symbol, m] = fundamental_metric(soup, m)
-            except Exception as e:
-                print (symbol, 'not found')
-        return df            
-        
+#    df = data.DataReader('BANPU.bk', data_source='yahoo', start='2015-01-01', end= '2020-07-29')
 
 #FireBase.firebase_login()
 #main_window.register()
