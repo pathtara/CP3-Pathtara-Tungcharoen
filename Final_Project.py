@@ -1,16 +1,7 @@
-#Business Strategic Analysis
-#import pandas as pd
-#from sklearn import *
-#import seaborn as sns
-#import matplotlib.pyplot as plt
+
 import firebase_admin
-#import requests
-#from pandas_datareader import data
 from firebase_admin import credentials
 from firebase_admin import db
-#from bs4 import BeautifulSoup as bs
-
-
 
 
 class FireBase:
@@ -83,31 +74,25 @@ class main_window:
     def main_equity():
         pass 
         
-        
+        ce
     def exit_program():
         print("Thank you".center(40, "-"))    
-        
 
-class inventory:
-    def input_data():
-        name = str(input("Name: "))
-        catagory = str(input("Catagory: "))
-         unit = str(input("Unit: "))
-        
-        
-        
-        
-     
-    def eoq():
-        pass       
 
+class Products:
+    def product_list():
+        ref = db.reference('Products')
+        print(ref.get().keys())
+        product_keys = list(ref.get().keys())
+        for i in range(len(product_keys)):
+            number = i+1
+            code = product_keys[i]
+            name = db.reference('Products/%s/Name' % code)
+            price = db.reference('Products/%s/Price' % code)
+            stock = db.reference('Products/%s/Stock' % code)
+            print("%d.%s      Price: %d    Stock: %d" % (number, name.get(), price.get(), stock.get()))
         
-#class Equity:
-#    def get_quote():
-#        pass
-    
-#    df = data.DataReader('BANPU.bk', data_source='yahoo', start='2015-01-01', end= '2020-07-29')
-
-#FireBase.firebase_login()
+FireBase.firebase_login()
+Products.product_list()
 #main_window.register()
 #main_window.login()
