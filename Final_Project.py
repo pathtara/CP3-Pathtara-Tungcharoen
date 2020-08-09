@@ -7,18 +7,18 @@ from forex_python.converter import CurrencyRates as c
 
 class FireBase:
     def firebase_login():
-#        cred = credentials.Certificate(
-#            'python3-born2dev-firebase-adminsdk-lvxno-853811d7e7.json'
-#            )
         cred = credentials.Certificate(
             'python3-born2dev-firebase-adminsdk-lvxno-853811d7e7.json'
             )
         firebase_admin.initialize_app(cred, {
             'databaseURL' : 'https://python3-born2dev.firebaseio.com/'
             })
-        
+            
 
 class MainWindow:
+    
+    username = str()
+    
     def register():
         user_data = db.reference('Users').get()
         while True:
@@ -52,11 +52,12 @@ class MainWindow:
     def login():
         user_data = db.reference('Users').get()
         for i in range(0, 5):
-            username = str(input("Username : "))
+            MainWindow.username = str(input("Username : "))
             password = str(input("Password : "))
             try:
-                if username in (user_data.keys()) and password == str(user_data[username]['password']):
+                if MainWindow.username in (user_data.keys()) and password == str(user_data[MainWindow.username]['password']):
                     print("Login Success")
+                    return MainWindow.main_menu()
                     break
                 else:
                     pass
@@ -65,7 +66,7 @@ class MainWindow:
             print("Incorrect username or password. Please try again.")
             print("You can try in %d times" % (4 - i))
             print("")
-        main_window.exit_program()
+        MainWindow.exit_program()
         # back to main menu
                                         
 
@@ -78,9 +79,12 @@ class MainWindow:
         try:
             selection = int(input("Menu Selected: "))
             if selection == 1 :
-                pass
+                print("Product List".center(30, "-"))
+                Products.product_list()
+                MainWindow.main_menu()
             elif selection == 2:
-                pass
+                print("Ordering".center(30, "-"))
+                Cart.add_cart()
             elif selection == 3:
                 pass
             elif selection == 4:
@@ -99,13 +103,17 @@ class MainWindow:
 
 
 
-class Products:
+class Products:        
+    
+    def product_code():
+        all_products = db.reference('Products')
+        product_code = list(all_products.get().keys())
+        return product_code
         
     def product_list():
         all_products = db.reference('Products')
-        print(all_products.get().keys())
         product_code = list(all_products.get().keys())
-        for i in range(len(product_code)):
+        for i in range(len(Products.product_code())):
             number = i+1
             code = product_code[i]
             name = db.reference('Products/%s/Name' % code)
@@ -118,8 +126,9 @@ class Products:
             
             
 class Cart:
+    
     cart = list()               
-    selected_code = ""
+    selected_code = str()
     selected_qty = 0
     
     def add_cart():
@@ -128,15 +137,32 @@ class Cart:
         while True:
             Cart.code_select()
             Cart.qty_select()      
-            add_code = db.reference('Product').get()
-            
+            system_products = db.reference('Products')
+            my_cart = db.reference('Carts/%s' % MainWindow.username)
+            add_price = my_cart.push({
+            "code": Cart.selected_code,
+            "quantity": Cart.selected_qty
+            })
+            print("Your products has been added to cart.")
+            # add update cart details
+            print("")
+            print(add_price.get())
+            choice = str(input("Do you want to continue order products? (Y/N): "))
+            # ถ้ามีสินค้าอยู่แล้วให้ตั้งเป็น update
+            if choice.upper() == "Y":
+                True
+            elif choice.upper() == "N":
+                break
+            else:
+                print("(Please type (Y) or (N)")
+          
     def code_select():
         Cart.selected_code = str(input("Products Code: "))
-        if selected_code in Products.product_code:
-            pass
+        if Cart.selected_code in Products.product_code():
+            return Cart.selected_code
         else:
             print("No product code found. Please try again.")
-            return Cart.code_select()
+            return code_select()
             
     def qty_select():
             try:
@@ -144,12 +170,10 @@ class Cart:
             except:
                 print("Only Number can be input. Please try again.")
                 return Cart.qty_select()
-                    
-        
-        
-#FireBase.firebase_login()
-#Products.product_list()
-#MainWindow.register()
-#MainWindow.login()
+                
 
+FireBase.firebase_login()
+MainWindow.login()
 #Cart.add_cart()
+#print("ppp",Cart.selected_code)
+print(MainWindow.username)
