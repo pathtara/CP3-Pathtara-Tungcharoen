@@ -32,9 +32,9 @@ y_predict = model.predict(x_test)  # โยนตัวแปรที่ทร�
 
 
 # plot regression
-#plt.scatter(x_test, y_test)
-#plt.plot(x_test, y_predict, color = "red")
-#plt.show()
+plt.scatter(x_test, y_test)
+plt.plot(x_test, y_predict, color = "red")
+plt.show()
 
 # เทียบข้อมูลจริง กับ ข้อมูลที่พยากรณ์
 df = pd.DataFrame({'Actually':y_test.flatten(), 'Predicted':y_predict.flatten()}) 
