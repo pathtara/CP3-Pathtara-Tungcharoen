@@ -24,9 +24,17 @@ firebase_admin.initialize_app(cred, {
 #print(columnar(data, header, no_borders=True))
     
 class StringFormat:
-    space = ''
-    def underline(string):
-        
+    result = ''
+    
+    def add_underline(string):
+#        result = StringFormat.result
+        result = ''
+        for i in range(0, len(string)):
+            if string[i] == ' ':
+                result = result + string[i]
+            else:
+                result = result + string[i] + str('\u0332')
+        return result
          
 
 class MainWindow:
@@ -131,19 +139,44 @@ class Products:
 #        product_code = list(all_products.get().keys())
 #        return product_code
 
-    def outstanding_category():
+    def outstanding_product():
         ref = Products.ref
+        dict = ref.get()
         categories = list(ref.get().keys())
-        print("\u0332"+("Current Category"))
+        products_all = list()
+        products_header = [ # ตั้งให้ auto gen
+            'Code',
+            'Category',
+#            'Name', อย่าลืมใส่คืน
+            'Brand',
+            'Unit Price',
+            'Quantity'
+            ] 
+        
+#         add code to list
         for i in range(len(categories)):
-            print(categories[i])
+            products = list(ref.child(categories[i]).get().keys())
+            for j in range(len(products)):
+                products_all.append([
+                products[j], 
+                categories[i],
+#                dict[categories[i]][products[j]]['Name'],
+                dict[categories[i]][products[j]]['Brand'],
+                dict[categories[i]][products[j]]['UnitPrice'],
+                dict[categories[i]][products[j]]['Stock']
+                ])
+        print(StringFormat.add_underline('Outstanding Products'))
+        print(columnar(products_all, products_header, no_borders=True))
+
         
                
-    def outstanding_products():
-        pass    
+#    def outstanding_products():
+#        pass    
         
     def add(): # for admin use
         ref = Products.ref
+        Products.outstanding_category()
+        print("")
         category = str(input("Product Category: "))
         code = str(input("Product Code: "))
         name = str(input("Product Name: "))
@@ -310,5 +343,5 @@ class Cart:
 #print(MainWindow.username)
 #Cart.cart_status()
 #Cart.check_cart(Cart.ref)
-Products.outstanding_category()
+Products.outstanding_product()
 #Products.add()
