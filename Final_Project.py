@@ -124,9 +124,21 @@ class MainWindow:
         SystemExit()
 
 
-
+class MainVar:
+    # ['Variable name', 'Description']
+    product_var = [
+        ['Category', 'Product Category'],
+        ['Code', 'Product Code'],
+        ['Name', 'Product Name'],
+        ['Brand', 'Product Brand'],
+        ['UnitPrice', 'Unit Price'],
+        ['Quantity', 'Quantity']    
+    ]
+    
+    
 class Products:
     ref = db.reference('Products')        
+    product_code = list()
     category = str()
     code = str()
     name = str()
@@ -141,61 +153,105 @@ class Products:
 
     def outstanding_product():
         ref = Products.ref
+        product_code = Products.product_code
         dict = ref.get()
         categories = list(ref.get().keys())
-        products_all = list()
-        products_header = [ # ตั้งให้ auto gen
+        product_details = list()
+        product_header = [ # ตั้งให้ auto gen
             'Code',
-            'Category',
-#            'Name', อย่าลืมใส่คืน
-            'Brand',
-            'Unit Price',
+#            'Catagory',
+            'Name',
+#            'Brand',
+#            'Unit Price',
             'Quantity'
-            ] 
-        
+        ]            
+                
 #         add code to list
         for i in range(len(categories)):
             products = list(ref.child(categories[i]).get().keys())
             for j in range(len(products)):
-                products_all.append([
+                Products.product_code.append(products[j])
+                product_details.append([
                 products[j], 
-                categories[i],
-#                dict[categories[i]][products[j]]['Name'],
-                dict[categories[i]][products[j]]['Brand'],
-                dict[categories[i]][products[j]]['UnitPrice'],
-                dict[categories[i]][products[j]]['Stock']
+#                categories[i],
+                dict[categories[i]][products[j]]['Name'],
+#                dict[categories[i]][products[j]]['Brand'],
+#                dict[categories[i]][products[j]]['UnitPrice'],
+                dict[categories[i]][products[j]]['Quantity']
                 ])
         print(StringFormat.add_underline('Outstanding Products'))
-        print(columnar(products_all, products_header, no_borders=True))
-
-        
-               
-#    def outstanding_products():
-#        pass    
+        print(columnar(product_details, product_header, no_borders=True))
+        print("")
         
     def add(): # for admin use
+        Products.outstanding_product()
         ref = Products.ref
-        Products.outstanding_category()
+        product_code = Products.product_code
         print("")
-        category = str(input("Product Category: "))
-        code = str(input("Product Code: "))
-        name = str(input("Product Name: "))
-        brand = str(input("Brand: "))
-        unit_price = float(input("Unit Price: "))
-        stock = int(input("Quantity: "))
-        
-        product_added = ref.child('%s/%s' % (category, code))
+        print(product_code)
+        # input product's category
+        category_input = str(input("Product Category: "))
+        # input product's code
+        while True:
+            code_input = str(input("Product Code: "))
+            if code_input in product_code:
+                print('This code has been registered')
+                print('Please try again or type "exit" to return to menu')
+            elif code_input.lower() == 'exit':
+                print("")
+                MainWindow.main_menu()
+            else:
+                break
+        # input product's name
+        name_input = str(input("Product Name: "))
+        # input product's brand
+        brand_input = str(input("Brand: "))
+        # input unit price
+        while True:
+            try:
+                unit_price_input = float(input("Unit Price: "))
+                break
+            except ValueError:
+                print('Invalid amount. Please try again.')
+        # input product's quantity
+        while True:
+            try:
+                quantity_input = int(input("Quantity: "))
+                break
+            except ValueError:
+                print('Invalid quantity. Please try again.')
+        # print part
+        product_added = ref.child('%s/%s' % (category_input, code_input))
         product_added.set({
-        'Name':name,
-        'Brand':brand,
-        'UnitPrice':unit_price,
-        'Stock':stock
+        'Name':name_input,
+        'Brand':brand_input,
+        'UnitPrice':unit_price_input,
+        'Quantity':quantity_input
         })
-
-        print(product_added.get())
          
     def update():
         pass
+        
+    def delete_category():
+        pass 
+                       
+    def delete_code():
+        ref = Products.ref
+        product_code = Products.product_code
+        Products.outstanding_product()
+        while True:
+            delete_target = str(input('Input the product code you want to delete or type "exit" to return to main menu: '))
+            if delete_target in product_code:
+                ref.child(delete_target).delete()
+                print('Product code no.%s has been deleted.' % delete_target)
+                break
+            elif delete_target.lower() == 'exit':
+                print("")
+                MainWindow.main_menu()
+            else:
+                print("")
+                print('Invalid product code. Please try again.')
+                         
              
     def product_category():
         ref = Products.ref
@@ -343,5 +399,6 @@ class Cart:
 #print(MainWindow.username)
 #Cart.cart_status()
 #Cart.check_cart(Cart.ref)
-Products.outstanding_product()
+#Products.outstanding_product()
 #Products.add()
+Products.delete_code()
