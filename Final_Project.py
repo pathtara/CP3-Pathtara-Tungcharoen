@@ -180,7 +180,7 @@ class Products:
                 dict[categories[i]][products[j]]['Quantity']
                 ])
         print(StringFormat.add_underline('Outstanding Products'))
-        print(columnar(product_details, product_header, no_borders=True))
+        print(columnar(product_details, product_header, no_borders=False))
         print("")
         
     def add(): # for admin use
@@ -249,8 +249,8 @@ class Products:
                 print("")
                 MainWindow.main_menu()
             else:
-                print("")
                 print('Invalid product code. Please try again.')
+                print("")
                          
              
     def product_category():
