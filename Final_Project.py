@@ -40,9 +40,36 @@ class StringFormat:
 class MainWindow:
 #    username = str()
     username = "admin"
+    ref = db.reference('Users')
     
+    def menu_select():
+        selection = 0
+        while True:
+            try:
+                selection = int(input("Menu selected No.: "))
+                break
+            except ValueError:
+                print("Only number can be inputed. Please try again.")                
+        return selection
+        
+    def welcome():
+        shop_name = "Full Senses Phone&Gadget"
+        header = [["Welcome to %s" % shop_name]]
+        print(columnar(header, no_borders=False))
+        print("1.Login")
+        print("2.Register")
+        selection = MainWindow.menu_select()
+        if selection == 1:
+            MainWindow.login()
+        elif selection == 2:
+            MainWindow.register()
+        else:
+            print("Invalid menu selected. Please try again.")
+            MainWindow.welcome()
+        
+                
     def register():
-        user_data = db.reference('Users').get()
+        user_data = MainWindow.ref.get()
         while True:
             user_input = str(input("Username: "))
             if user_input in user_data.keys():
@@ -66,9 +93,11 @@ class MainWindow:
             'password': password_input_1,
             'firstname': first_name,
             'lastname': last_name,
-            'age': age
+            'age': age,
+            'authentication':'User'
             })                                                
-        print("Registier Complete.")
+        print("Register Complete.")
+        MainWindow.welcome()
         
                     
     def login():
@@ -79,8 +108,7 @@ class MainWindow:
             try:
                 if MainWindow.username in (user_data.keys()) and password == str(user_data[MainWindow.username]['password']):
                     print("Login Success")
-                    return MainWindow.main_menu()
-                    break
+                    MainWindow.main_menu()
                 else:
                     pass
             except KeyError:
@@ -91,7 +119,33 @@ class MainWindow:
         MainWindow.exit_program()
         # back to main menu
                                         
-
+    def main_menu_admin():
+        header = [["Administrator Control"]]
+        print(columnar(header,no_borders=False))
+        print("1.Outstanding Product")
+        print("2.Add Product")
+        print("3.Delete Product")
+        print("4.Exit Program")
+        selection = 0
+        try:
+            selection = int(input("Menu Selected No.: "))
+            if selection == 1:
+                Products.outstanding_product()
+                MainWindow.main_menu_admin()
+            elif selection == 2:
+                Products.add()
+                MainWindow.main_menu_admin()
+            elif selection == 3:
+                Products.delete_code()
+            elif selection == 4:
+                MainWindow.exit_program()
+            else:
+                print("Invalid selection. Please try again")
+        except ValueError:
+            print("Only number can be inputed. Please try again.")    
+            MainWindow.main_menu_admin()        
+    
+    
     def main_menu():
         print("1.Products List")
         print("2.Order Product")
@@ -99,7 +153,7 @@ class MainWindow:
         print("4.Exit Program")
         selection = 0
         try:
-            selection = int(input("Menu Selected: "))
+            selection = int(input("Menu Selected No.: "))
             if selection == 1 :
                 print("Product List".center(30, "-"))
                 Products.product_list()
@@ -110,10 +164,10 @@ class MainWindow:
             elif selection == 3:
                 Cart.cart_status()
             elif selection == 4:
-                return MainWindow.exit_program()
+                MainWindow.exit_program()
             else:
                 print("No Menu Selected. Please try again.")
-                return MainWindow.main_menu()
+                MainWindow.main_menu()
         except ValueError:
             print("Only number can be inputed. Please try again.(Menu)")
 #            return MainWindow.main_menu()                         
@@ -243,6 +297,7 @@ class Products:
             delete_target = str(input('Input the product code you want to delete or type "exit" to return to main menu: '))
             if delete_target in product_code:
                 ref.child(delete_target).delete()
+                Products.outstanding_product()
                 print('Product code no.%s has been deleted.' % delete_target)
                 break
             elif delete_target.lower() == 'exit':
@@ -391,14 +446,7 @@ class Cart:
 #        cart_key = list(cart.get().keys())
 #        print(cart_key['code'])
         print(cart.get())
-
-#FireBase.firebase_login()
-#MainWindow.login()
-#Cart.add_cart()
-#print("ppp",Cart.selected_code)
-#print(MainWindow.username)
-#Cart.cart_status()
-#Cart.check_cart(Cart.ref)
-#Products.outstanding_product()
-#Products.add()
-Products.delete_code()
+        
+        
+############## Running Process ##############
+MainWindow.welcome()
