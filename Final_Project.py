@@ -2,14 +2,21 @@
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
-from forex_python.converter import CurrencyRates as c
+# from forex_python.converter import CurrencyRates as c
 from columnar import columnar
 
 
-# Connect to Firebase
+# # Connect to Firebase
+# iPad
+# cred = credentials.Certificate(
+#     'python3-born2dev-firebase-adminsdk-lvxno-853811d7e7.json'
+#     )
+
+# pc
 cred = credentials.Certificate(
     'python3-born2dev-firebase-adminsdk-lvxno-853811d7e7.json'
     )
+
 firebase_admin.initialize_app(cred, {
     'databaseURL' : 'https://python3-born2dev.firebaseio.com/'
     })           
