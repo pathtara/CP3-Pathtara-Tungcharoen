@@ -91,25 +91,32 @@ class MainWindow:
         ref = db.reference('Users')
         user_ref = ref.child(user_input)
         user_ref.set({
-            'password': password_input_1,
-            'firstname': first_name,
-            'lastname': last_name,
+            'Password': password_input_1,
+            'Firstname': first_name,
+            'Lastname': last_name,
 #            'age': age,
-            'authentication':'User'
+            'Authentication':'User'
             })                                                
         print("Register Complete.")
         MainWindow.welcome()
         
                     
     def login():
-        user_data = db.reference('Users').get()
+        ref = db.reference('Users')
+        authentication = db.reference('Users/%s/Authentication' % MainWindow.username)
+        user_data = ref.get()
         for i in range(0, 5):
             MainWindow.username = str(input("Username : "))
             password = str(input("Password : "))
             try:
-                if MainWindow.username in (user_data.keys()) and password == str(user_data[MainWindow.username]['password']):
+                if MainWindow.username in (user_data.keys()) and password == str(user_data[MainWindow.username]['Password']):
                     print("Login Success")
-                    MainWindow.main_menu()
+                    if authentication.get() == "Admin":
+                        MainWindow.main_menu_admin()
+                        break
+                    else:
+                        MainWindow.main_menu()
+                        break
                 else:
                     pass
             except KeyError:
@@ -461,5 +468,4 @@ class Cart:
         
         
 ############## Running Process ##############
-#MainWindow.welcome()
-Products.product_list()
+MainWindow.welcome()
