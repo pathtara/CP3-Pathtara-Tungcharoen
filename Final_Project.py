@@ -1,22 +1,16 @@
 
 import firebase_admin
+import numpy as np
 from firebase_admin import credentials
 from firebase_admin import db
-# from forex_python.converter import CurrencyRates as c
+from forex_python.converter import CurrencyRates as c
 from columnar import columnar
 
 
-# # Connect to Firebase
-# iPad
-# cred = credentials.Certificate(
-#     'python3-born2dev-firebase-adminsdk-lvxno-853811d7e7.json'
-#     )
-
-# pc
+# Connect to Firebase
 cred = credentials.Certificate(
     'python3-born2dev-firebase-adminsdk-lvxno-853811d7e7.json'
     )
-
 firebase_admin.initialize_app(cred, {
     'databaseURL' : 'https://python3-born2dev.firebaseio.com/'
     })           
@@ -93,14 +87,14 @@ class MainWindow:
                 print("Password and confirm password did not match. Please try again.")            
         first_name = str(input("First name: "))
         last_name = str(input("Last name: "))
-        age = int(input("Age: "))  # Only number can be inputed
+#        age = int(input("Age: "))  # Only number can be inputed
         ref = db.reference('Users')
         user_ref = ref.child(user_input)
         user_ref.set({
             'password': password_input_1,
             'firstname': first_name,
             'lastname': last_name,
-            'age': age,
+#            'age': age,
             'authentication':'User'
             })                                                
         print("Register Complete.")
@@ -233,12 +227,12 @@ class Products:
             for j in range(len(products)):
                 Products.product_code.append(products[j])
                 product_details.append([
-                products[j], 
-#                categories[i],
-                dict[categories[i]][products[j]]['Name'],
-#                dict[categories[i]][products[j]]['Brand'],
-#                dict[categories[i]][products[j]]['UnitPrice'],
-                dict[categories[i]][products[j]]['Quantity']
+                    products[j], 
+#                    categories[i],
+                    dict[categories[i]][products[j]]['Name'],
+#                    dict[categories[i]][products[j]]['Brand'],
+#                    dict[categories[i]][products[j]]['UnitPrice'],
+                    dict[categories[i]][products[j]]['Quantity']
                 ])
         print(StringFormat.add_underline('Outstanding Products'))
         print(columnar(product_details, product_header, no_borders=False))
@@ -323,16 +317,27 @@ class Products:
         
     def product_list():
         ref = Products.ref
-        product_code = list(ref.get().keys())
-        del product_code[0] # ยังต้อง fix ให้ 'Pattern' เป็นตำแหน่งที่ 0
-        print(product_code)
-        for i in range(len(product_code)):
-            number = i+1
-            code = product_code[i]
-            name = db.reference('Products/%s/Name' % code)
-            price = db.reference('Products/%s/Price' % code)
-            stock = db.reference('Products/%s/Stock' % code)
-            print("%d.%s      Price: %d    Stock: %d" % (number, name.get(), price.get(), stock.get()))
+        category = list(ref.get().keys())
+        header = [" ", "Product Name", "Product Price"]
+        product_data = list()
+        number = 0
+        
+        for i in range(len(category)):
+            code = list(ref.child(category[i]).get().keys())
+            product_category = category[i]
+            for j in range(len(code)):
+                number += 1
+                name = db.reference('Products/%s/%s/Name' % (category[i],code[j])).get()
+                price = round((db.reference('Products/%s/%s/UnitPrice' % (category[i], code[j])).get()), 2)
+#                stock = db.reference('Products/%s/%s/Quantity' % (category[i], code[j])).get()
+#                print("%d.%s      Price: %f    Stock: %d" % (number, name, price, stock))
+                product_data.append([
+                    [number],
+                    [name],
+                    [price],
+#                    [stock] 
+                ])
+        print(columnar(product_data, header, no_borders=False))
         print("Shiping fee is equal USD 40.00 per shipment.")
         print("All price are subject to VAT 7%")
         print("Due to Thailand Custom Policy, import tax will not be charged for mobile phone.")
@@ -456,4 +461,5 @@ class Cart:
         
         
 ############## Running Process ##############
-MainWindow.welcome()
+#MainWindow.welcome()
+Products.product_list()
