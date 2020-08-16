@@ -298,21 +298,25 @@ class Products:
         pass 
                        
     def delete_code():
-        ref = Products.ref
-        product_code = Products.product_code
+        product_ref = Products.ref
         Products.outstanding_product()
         while True:
-            delete_target = str(input('Input the product code you want to delete or type "exit" to return to main menu: '))
-            if delete_target in product_code:
-                ref.child(delete_target).delete()
-                Products.outstanding_product()
-                print('Product code no.%s has been deleted.' % delete_target)
-                break
-            elif delete_target.lower() == 'exit':
-                print("")
-                MainWindow.main_menu()
-            else:
-                print('Invalid product code. Please try again.')
+            delete_target = str(input('Input the product code you want to delete or type "exit" to return to main menu: ')).lower()
+            category_key = list(product_ref.get().keys())
+            for product_code in category_key:
+                category_ref = product_ref.child(product_code)
+                product_code = list(category_ref.get().keys())
+                if delete_target in product_code:
+                    print(delete_target)
+                    product_ref.child('%s/%s' % (product_code, delete_target)).delete()
+                    Products.outstanding_product()
+                    print('Product code no.%s has been deleted.' % delete_target)
+                    break
+                elif delete_target.lower() == 'exit':
+                    print("")
+                    MainWindow.main_menu()
+                else:
+                    print('Invalid product code. Please try again.')
                 print("")
                          
              
@@ -468,4 +472,15 @@ class Cart:
         
         
 ############## Running Process ##############
-MainWindow.welcome()
+#MainWindow.welcome()
+Products.delete_code()
+
+#Products.outstanding_product()
+#ref = db.reference('Products')
+#key = list(ref.get().keys())
+#print(key)
+#for i in key:
+#    ref2 = ref.child(i)
+#    key2 = list(ref2.get().keys())
+#    print(key2)
+#    forj in key
