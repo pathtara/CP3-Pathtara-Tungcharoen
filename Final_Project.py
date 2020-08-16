@@ -39,8 +39,7 @@ class StringFormat:
          
 
 class MainWindow:
-#    username = str()
-    username = "admin"
+    username = str()
     ref = db.reference('Users')
     
     def menu_select():
@@ -75,9 +74,8 @@ class MainWindow:
             user_input = str(input("Username: "))
             if user_input in user_data.keys():
                print("Username alreadys exists, please try the different one.")
-               True
-            else:               
-                break
+            else:           
+                break    
         while True:                            
             password_input_1 = str(input("Password: "))
             password_input_2 = str(input("Confirm password: "))            
@@ -98,19 +96,24 @@ class MainWindow:
             'Authentication':'User'
             })                                                
         print("Register Complete.")
+        print("Returning to mainmenu")
+        print("")
         MainWindow.welcome()
         
                     
     def login():
         ref = db.reference('Users')
-        authentication = db.reference('Users/%s/Authentication' % MainWindow.username)
         user_data = ref.get()
         for i in range(0, 5):
             MainWindow.username = str(input("Username : "))
             password = str(input("Password : "))
+            authentication = db.reference(
+                'Users/%s/Authentication' % MainWindow.username
+            )
             try:
                 if MainWindow.username in (user_data.keys()) and password == str(user_data[MainWindow.username]['Password']):
                     print("Login Success")
+                    print("")
                     if authentication.get() == "Admin":
                         MainWindow.main_menu_admin()
                         break
@@ -124,12 +127,17 @@ class MainWindow:
             print("Incorrect username or password. Please try again.")
             print("You can try in %d times" % (4 - i))
             print("")
-        MainWindow.exit_program()
+        MainWindow.welcome()
         # back to main menu
                                         
     def main_menu_admin():
         header = [["Administrator Control"]]
-        print(columnar(header,no_borders=False))
+        print(columnar(header,
+            terminal_width=100,
+            min_column_width=50,
+            justify='c'
+            )
+        )
         print("1.Outstanding Product")
         print("2.Add Product")
         print("3.Delete Product")
@@ -138,23 +146,35 @@ class MainWindow:
         try:
             selection = int(input("Menu Selected No.: "))
             if selection == 1:
+                print("")
                 Products.outstanding_product()
                 MainWindow.main_menu_admin()
             elif selection == 2:
+                print("")
                 Products.add()
                 MainWindow.main_menu_admin()
             elif selection == 3:
+                print("")
                 Products.delete_code()
             elif selection == 4:
-                MainWindow.exit_program()
+                print("")
+                pass
             else:
                 print("Invalid selection. Please try again")
-        except ValueError:
+        except KeyError:
             print("Only number can be inputed. Please try again.")    
             MainWindow.main_menu_admin()        
     
     
     def main_menu():
+        header = [['Main Menu']]
+        print(columnar(
+            header, 
+            terminal_width=100,
+            min_column_width=50,
+            justify='c'
+            )
+        )
         print("1.Products List")
         print("2.Order Product")
         print("3.Show my cart")
@@ -163,29 +183,34 @@ class MainWindow:
         try:
             selection = int(input("Menu Selected No.: "))
             if selection == 1 :
+                print("")
                 print("Product List".center(30, "-"))
                 Products.product_list()
                 MainWindow.main_menu()
             elif selection == 2:
+                print("")
                 print("Ordering".center(30, "-"))
                 Cart.add_cart()
             elif selection == 3:
+                print("")
                 Cart.cart_status()
             elif selection == 4:
+                print("")
                 MainWindow.exit_program()
             else:
+                print("")
                 print("No Menu Selected. Please try again.")
                 MainWindow.main_menu()
         except ValueError:
             print("Only number can be inputed. Please try again.(Menu)")
-#            return MainWindow.main_menu()                         
-
+            return MainWindow.main_menu()                         
 
     def exit_program():
-        print("Thank you".center(40, "-"))    
-        SystemExit()
-
-
+        print("Thank you".center(50, "-"))    
+        print("")
+        MainWindow.welcome()
+        
+        
 class MainVar:
     # ['Variable name', 'Description']
     product_var = [
@@ -227,7 +252,6 @@ class Products:
 #            'Unit Price',
             'Quantity'
         ]            
-                
 #         add code to list
         for i in range(len(categories)):
             products = list(ref.child(categories[i]).get().keys())
@@ -242,7 +266,13 @@ class Products:
                     dict[categories[i]][products[j]]['Quantity']
                 ])
         print(StringFormat.add_underline('Outstanding Products'))
-        print(columnar(product_details, product_header, no_borders=False))
+        print(columnar(
+            product_details,
+            product_header,
+            terminal_width=100,
+            justify='c'
+            )
+        )
         print("")
         
     def add(): # for admin use
@@ -250,7 +280,6 @@ class Products:
         ref = Products.ref
         product_code = Products.product_code
         print("")
-        print(product_code)
         # input product's category
         category_input = str(input("Product Category: "))
         # input product's code
@@ -303,21 +332,26 @@ class Products:
         while True:
             delete_target = str(input('Input the product code you want to delete or type "exit" to return to main menu: ')).lower()
             category_key = list(product_ref.get().keys())
-            for product_code in category_key:
-                category_ref = product_ref.child(product_code)
+            stop = ""
+            for i in category_key:
+                category_ref = product_ref.child(i)
                 product_code = list(category_ref.get().keys())
                 if delete_target in product_code:
-                    print(delete_target)
-                    product_ref.child('%s/%s' % (product_code, delete_target)).delete()
+                    product_ref.child('%s/%s' % (i, delete_target)).delete()
                     Products.outstanding_product()
                     print('Product code no.%s has been deleted.' % delete_target)
-                    break
+                    stop = "Y"
                 elif delete_target.lower() == 'exit':
                     print("")
                     MainWindow.main_menu()
+                    return False
                 else:
-                    print('Invalid product code. Please try again.')
+                    stop = "N"
+            if stop == "N":
+                print('Invalid product code. Please try again.')
                 print("")
+            else :
+                pass
                          
              
     def product_category():
@@ -348,7 +382,13 @@ class Products:
                     [price],
 #                    [stock] 
                 ])
-        print(columnar(product_data, header, no_borders=False))
+        print(columnar(
+            product_data, 
+            header, 
+            justify='c',
+            terminal_width=100
+            )
+        )
         print("Shiping fee is equal USD 40.00 per shipment.")
         print("All price are subject to VAT 7%")
         print("Due to Thailand Custom Policy, import tax will not be charged for mobile phone.")
@@ -472,15 +512,4 @@ class Cart:
         
         
 ############## Running Process ##############
-#MainWindow.welcome()
-Products.delete_code()
-
-#Products.outstanding_product()
-#ref = db.reference('Products')
-#key = list(ref.get().keys())
-#print(key)
-#for i in key:
-#    ref2 = ref.child(i)
-#    key2 = list(ref2.get().keys())
-#    print(key2)
-#    forj in key
+MainWindow.welcome()
