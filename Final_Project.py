@@ -63,6 +63,7 @@ class MainWindow:
 
     def register():
         user_data = MainWindow.ref.get()
+        user_input = ""
         while True:
             user_input = str(input("Username: "))
             if user_input in user_data.keys():
@@ -90,6 +91,8 @@ class MainWindow:
                 "Authentication": "User",
             }
         )
+#        empty_cart_add = db.reference("Carts/%s" % user_input)
+#        empty_cart_add.set({"test": ""})
         print("Register Complete.")
         print("Returning to mainmenu")
         print("")
@@ -153,11 +156,12 @@ class MainWindow:
             else:
                 print("Invalid selection. Please try again")
                 print("")
-        except KeyError:
+                MainWindow.main_menu_admin()
+        except ValueError:
             print("Only number can be inputed. Please try again.")
             print("")
             MainWindow.main_menu_admin()
-
+ 
     def main_menu():
         header = [["Main Menu"]]
         print(columnar(header, terminal_width=100, min_column_width=50, justify="c"))
@@ -303,6 +307,7 @@ class Products:
                 "Quantity": quantity_input,
             }
         )
+        print("The product items has been add to system.")
 
     def update():
         pass
@@ -329,16 +334,16 @@ class Products:
                     stop = "Y"
                 elif delete_target.lower() == "exit":
                     print("")
-                    MainWindow.main_menu()
-                    return False
+                    MainWindow.main_menu_admin()
+                    stop = "Y"
                 else:
                     stop = "N"
             if stop == "N":
                 print("Invalid product code. Please try again.")
                 print("")
             else:
-                pass
-
+                break
+                
     def product_category():
         ref = Products.ref
         category = ref.get().keys()
